@@ -1,21 +1,24 @@
 FROM node:20-alpine
 
+# Set working directory
 WORKDIR /app
 
+# Copy backend package files
 COPY backend/package*.json ./backend/
 
-RUN cd backend && npm install
-
-COPY . .
+# Install backend dependencies
+WORKDIR /app/backend
 
 RUN npm install
 
-RUN npm run build
+# Return to app root
+WORKDIR /app
 
-RUN cp -r dist backend/
+# Copy entire project
+COPY . .
 
-WORKDIR /app/backend
-
+# Expose app port
 EXPOSE 4000
 
-CMD ["node", "server.js"]
+# Start metrics server
+CMD ["node", "backend/metricsServer.js"]
