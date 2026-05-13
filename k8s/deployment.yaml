@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: finops-platform
+  namespace: finops
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: finops-platform
+
+  template:
+    metadata:
+      labels:
+        app: finops-platform
+
+    spec:
+      containers:
+        - name: finops-platform
+
+          image: 243699833421.dkr.ecr.us-east-1.amazonaws.com/finops-app:${IMAGE_TAG}
+
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 4000
+
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+
+          env:
+            - name: AWS_REGION
+              value: "us-east-1"
+
+            - name: NEW_RELIC_APP_NAME
+              value: "finops-platform"
+
+            - name: NEW_RELIC_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: newrelic-secret
+                  key: licenseKey
+
+          envFrom:
+            - configMapRef:
+                name: finops-config

@@ -1,0 +1,25 @@
+data/
+coverage/
+newrelic_agent.log
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Node
+node_modules/
+
+# Logs
+*.log
+
+# Environment
+.env
+
+# Build artifacts
+dist/
+build/
+
+# Findings
+findings/
