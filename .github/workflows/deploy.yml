@@ -58,6 +58,10 @@ jobs:
             --region $AWS_REGION \
             --name finops-cluster
 
+      - name: Verify Kubernetes Access
+        run: |
+          kubectl get nodes
+
       - name: Deploy to Kubernetes
         run: |
           kubectl set image deployment/finops-platform \
