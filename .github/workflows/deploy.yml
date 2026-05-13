@@ -5,12 +5,19 @@ on:
     branches:
       - main
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     env:
       IMAGE_TAG: ${{ github.sha }}
+      AWS_REGION: us-east-1
+      ECR_REPOSITORY: finops-app
+      EKS_CLUSTER_NAME: finops-cluster
 
     steps:
       - name: Checkout Code
@@ -19,37 +26,44 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::243699833421:role/github-actions-oidc-role
           aws-region: us-east-1
 
       - name: Login to Amazon ECR
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build Docker Image
         run: |
           docker build \
-          -t finops-app:${IMAGE_TAG} .
+            -t $finops-app:$IMAGE_TAG .
 
       - name: Tag Docker Image
         run: |
           docker tag \
-          finops-app:${IMAGE_TAG} \
-          243699833421.dkr.ecr.us-east-1.amazonaws.com/finops-app:${IMAGE_TAG}
+            $finops-app:$IMAGE_TAG \
+            243699833421.dkr.ecr.us-east-1.amazonaws.com/$finops-app:$IMAGE_TAG
 
       - name: Push Docker Image
         run: |
           docker push \
-          243699833421.dkr.ecr.us-east-1.amazonaws.com/finops-app:${IMAGE_TAG}
+            243699833421.dkr.ecr.us-east-1.amazonaws.com/$finops-app:$IMAGE_TAG
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
 
       - name: Update kubeconfig
         run: |
           aws eks update-kubeconfig \
-          --region us-east-1 \
-          --name finops-cluster
+            --region $AWS_REGION \
+            --name $finops-cluster
 
-      - name: Update Kubernetes Deployment
+      - name: Deploy to Kubernetes
         run: |
           kubectl set image deployment/finops-platform \
-          finops-platform=243699833421.dkr.ecr.us-east-1.amazonaws.com/finops-app:${IMAGE_TAG} \
+          finops-platform=243699833421.dkr.ecr.us-east-1.amazonaws.com/$finops-app:$IMAGE_TAG \
           -n finops
+
+      - name: Verify Rollout
+        run: |
+          kubectl rollout status deployment/finops-platform -n finops
