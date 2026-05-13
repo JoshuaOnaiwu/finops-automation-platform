@@ -36,18 +36,18 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-            -t $finops-app:$IMAGE_TAG .
+            -t finops-app:$IMAGE_TAG .
 
       - name: Tag Docker Image
         run: |
           docker tag \
-            $finops-app:$IMAGE_TAG \
-            243699833421.dkr.ecr.us-east-1.amazonaws.com/$finops-app:$IMAGE_TAG
+            finops-app:$IMAGE_TAG \
+            243699833421.dkr.ecr.us-east-1.amazonaws.com/finops-app:$IMAGE_TAG
 
       - name: Push Docker Image
         run: |
           docker push \
-            243699833421.dkr.ecr.us-east-1.amazonaws.com/$finops-app:$IMAGE_TAG
+            243699833421.dkr.ecr.us-east-1.amazonaws.com/finops-app:$IMAGE_TAG
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v4
@@ -56,12 +56,12 @@ jobs:
         run: |
           aws eks update-kubeconfig \
             --region $AWS_REGION \
-            --name $finops-cluster
+            --name finops-cluster
 
       - name: Deploy to Kubernetes
         run: |
           kubectl set image deployment/finops-platform \
-          finops-platform=243699833421.dkr.ecr.us-east-1.amazonaws.com/$finops-app:$IMAGE_TAG \
+          finops-platform=243699833421.dkr.ecr.us-east-1.amazonaws.com/finops-app:$IMAGE_TAG \
           -n finops
 
       - name: Verify Rollout
