@@ -67,7 +67,6 @@ finops-automation-platform/
 ├── .github/workflows/deploy.yml
 ├── Dockerfile
 ├── README.md
-├── aws-auth.yaml
 ├── backend/
 │   ├── server.js
 │   ├── package.json
