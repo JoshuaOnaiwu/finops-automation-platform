@@ -21,7 +21,7 @@ spec:
       containers:
         - name: finops-platform
 
-          image: 243699833421.dkr.ecr.us-east-1.amazonaws.com/finops-app:${IMAGE_TAG}
+          image: 243699833421.dkr.ecr.us-east-1.amazonaws.com/finops-app:ae2c42b9fb58a98b3fc1f25f38d091f1fa46c2b0
 
           imagePullPolicy: Always
 
@@ -40,15 +40,6 @@ spec:
           env:
             - name: AWS_REGION
               value: "us-east-1"
-
-            - name: NEW_RELIC_APP_NAME
-              value: "finops-platform"
-
-            - name: NEW_RELIC_LICENSE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: newrelic-secret
-                  key: licenseKey
 
           envFrom:
             - configMapRef:
