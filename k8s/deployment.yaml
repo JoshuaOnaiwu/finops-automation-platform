@@ -21,26 +21,34 @@ spec:
       containers:
         - name: finops-platform
 
-          image: 243699833421.dkr.ecr.us-east-1.amazonaws.com/finops-app:ae2c42b9fb58a98b3fc1f25f38d091f1fa46c2b0
+          image: ${ECR_IMAGE}:${IMAGE_TAG}
 
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
 
           ports:
             - containerPort: 4000
 
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "250m"
-
-            limits:
               memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
               cpu: "500m"
 
           env:
             - name: AWS_REGION
-              value: "us-east-1"
-
-          envFrom:
-            - configMapRef:
-                name: finops-config
+              valueFrom:
+                configMapKeyRef:
+                  name: finops-config
+                  key: AWS_REGION
+            - name: NEW_RELIC_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: finops-secrets
+                  key: newrelic-license-key
+            - name: NEW_RELIC_APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: finops-config
+                  key: NEW_RELIC_APP_NAME

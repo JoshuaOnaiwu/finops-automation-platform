@@ -7,3 +7,5 @@ metadata:
 
 data:
   AWS_REGION: "us-east-1"
+  NEW_RELIC_APP_NAME: "finops-platform"
+  APP_ENV: "production"

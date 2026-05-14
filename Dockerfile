@@ -1,24 +1,23 @@
-FROM node:20-alpine
+# syntax=docker/dockerfile:1
 
-# Set working directory
-WORKDIR /app
+FROM node:20-alpine AS frontend-build
+WORKDIR /app/frontend
 
-# Copy backend package files
-COPY backend/package*.json ./backend/
-
-# Install backend dependencies
-WORKDIR /app/backend
-
+COPY frontend/package*.json ./
 RUN npm install
 
-# Return to app root
-WORKDIR /app
+COPY frontend/ .
+RUN npm run build
 
-# Copy entire project
-COPY . .
+FROM node:20-alpine AS runtime
+WORKDIR /app/backend
 
-# Expose app port
+COPY backend/package*.json ./
+RUN npm ci --production
+
+COPY backend/ .
+COPY --from=frontend-build /app/frontend/dist ./dist
+COPY data ../data
+
 EXPOSE 4000
-
-# Start metrics server
-CMD ["node", "backend/metricsServer.js"]
+CMD ["node", "server.js"]

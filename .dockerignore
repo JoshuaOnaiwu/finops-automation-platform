@@ -1,0 +1,16 @@
+node_modules
+**/node_modules
+.git
+.gitignore
+.github
+infra
+k8s
+README.md
+Dockerfile
+*.md
+*.log
+*.tfstate
+*.tfstate.*
+.terraform
+npm-debug.log
+.env
