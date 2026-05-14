@@ -23,3 +23,9 @@ build/
 
 # Findings
 findings/
+
+# Kubernetes auth / cluster admin files
+aws-auth.yaml
+kubeconfig
+*.pem
+*.key
