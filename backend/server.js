@@ -87,7 +87,10 @@ app.get('/api/cart', (req, res) => {
 });
 
 app.post('/api/checkout', (req, res) => {
-  res.json({ message: 'Checkout successful', orderId: Math.floor(Math.random() * 100000) });
+  res.json({
+    message: 'Checkout successful',
+    orderId: Math.floor(Math.random() * 100000),
+  });
 });
 
 app.get('/metrics', async (req, res) => {
@@ -102,21 +105,33 @@ app.get('/metrics', async (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', region: AWS_REGION, time: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    region: AWS_REGION,
+    time: new Date().toISOString(),
+  });
 });
 
 if (fs.existsSync(path.join(FRONTEND_DIST, 'index.html'))) {
   app.use(express.static(FRONTEND_DIST));
 
-  app.get('*', (req, res) => {
-    if (req.path.startsWith('/api') || req.path.startsWith('/metrics')) {
-      return res.status(404).json({ error: 'Not found' });
+  app.use((req, res, next) => {
+    if (
+      req.path.startsWith('/api') ||
+      req.path.startsWith('/metrics') ||
+      req.path.startsWith('/health')
+    ) {
+      return next();
     }
+
     res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
   });
 } else {
   app.get('/', (req, res) => {
-    res.json({ message: 'FinOps backend is running', region: AWS_REGION });
+    res.json({
+      message: 'FinOps backend is running',
+      region: AWS_REGION,
+    });
   });
 }
 
